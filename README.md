@@ -225,19 +225,3 @@ Para agregar nuevas características:
 ## Licencia
 
 Este proyecto está licenciado bajo [MIT License](LICENSE).
-
-## Contribuir
-
-1. Fork el proyecto
-2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abrir un Pull Request
-
-## Soporte
-
-Para preguntas o problemas:
-
-1. Crear un issue en el repositorio
-2. Incluir logs relevantes
-3. Describir pasos para reproducir el problema 
