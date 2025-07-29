@@ -48,7 +48,7 @@ public class DeploymentPlan
     // Propiedades calculadas
     public bool IsRunning => Status.Contains("Running", StringComparison.OrdinalIgnoreCase);
     
-    public bool IsFinished => Status.Contains("Finished", StringComparison.OrdinalIgnoreCase);
+    public bool IsFinished => Status.Contains("Finished", StringComparison.OrdinalIgnoreCase) || Status.Contains("Successfully", StringComparison.OrdinalIgnoreCase);
     
     public bool IsHomologation => DeployedTo.Contains("Homologation", StringComparison.OrdinalIgnoreCase);
     
@@ -60,9 +60,28 @@ public class DeploymentPlan
                          IsProduction ? "Producción" : 
                          DeployedTo;
         
-        var action = IsRunning ? "está haciendo" : "hizo";
+        string action;
+        string article;
+        bool isMultiple = ProcessedDetails == "Varias aplicaciones";
+        
+        if (IsRunning)
+        {
+            action = isMultiple ? "están haciendo" : "está haciendo";
+            article = isMultiple ? "sus pases" : "su pase";
+        }
+        else if (IsFinished)
+        {
+            action = isMultiple ? "han terminado" : "ha terminado";
+            article = isMultiple ? "sus pases" : "su pase";
+        }
+        else
+        {
+            action = isMultiple ? "están en proceso" : "está en proceso";
+            article = isMultiple ? "sus pases" : "su pase";
+        }
+        
         var duration = Duration.HasValue ? $" (Duración: {Duration.Value:hh\\:mm\\:ss})" : "";
         
-        return $"{ProcessedDetails} {action} un pase a {environment}{duration}";
+        return $"{ProcessedDetails} {action} {article} a {environment}{duration}";
     }
 } 

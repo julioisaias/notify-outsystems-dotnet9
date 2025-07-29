@@ -117,8 +117,13 @@ public class DatabaseService : IDatabaseService
                 existingPlan.HasStatusChanged = true;
                 existingPlan.NotificationSent = false;
                 
+                // Evaluar estados antes de actualizar
+                var wasRunning = existingPlan.IsRunning;
+                var isNowFinished = plan.IsFinished;
+                var isNowRunning = plan.IsRunning;
+                
                 // Calcular duración si cambió de Running a Finished
-                if (existingPlan.IsRunning && plan.IsFinished)
+                if (wasRunning && isNowFinished)
                 {
                     existingPlan.EndTime = DateTime.Now;
                     if (existingPlan.StartTime.HasValue)
@@ -128,7 +133,7 @@ public class DatabaseService : IDatabaseService
                 }
                 
                 // Establecer tiempo de inicio si cambió a Running
-                if (!existingPlan.IsRunning && plan.IsRunning)
+                if (!wasRunning && isNowRunning)
                 {
                     existingPlan.StartTime = DateTime.Now;
                 }

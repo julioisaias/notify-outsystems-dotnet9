@@ -15,6 +15,13 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
+        // Verificar si se quiere ejecutar las pruebas de notificación
+        if (args.Length > 0 && args[0].Contains("TestNotifications", StringComparison.OrdinalIgnoreCase))
+        {
+            await TestNotifications.RunTests(args);
+            return;
+        }
+
         // Configurar Serilog
         var configuration = GetConfiguration();
         Log.Logger = new LoggerConfiguration()

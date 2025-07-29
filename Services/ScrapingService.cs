@@ -259,8 +259,11 @@ public class ScrapingService : IScrapingService, IDisposable
         if (parts.Length == 0)
             return details;
 
-        // Si el primer palabra es SAM, tomar las dos primeras palabras
-        if (parts[0].Equals("SAM", StringComparison.OrdinalIgnoreCase))
+        // Aplicaciones estándar que se manejan de forma especial
+        var standardApps = new[] { "SAM", "SICAFI", "SIAPI", "SIAPI2", "SIRHUS", "SIGECO" };
+        
+        // Si el primer palabra es una aplicación estándar, tomar las dos primeras palabras
+        if (standardApps.Contains(parts[0], StringComparer.OrdinalIgnoreCase))
         {
             if (parts.Length >= 2)
             {
@@ -269,7 +272,13 @@ public class ScrapingService : IScrapingService, IDisposable
             return parts[0];
         }
 
-        // Si no es SAM, tomar solo la primera palabra
+        // Si hay múltiples aplicaciones que no son estándar, indicar "Varias aplicaciones"
+        if (parts.Length > 1)
+        {
+            return "Varias aplicaciones";
+        }
+
+        // Si no es estándar y es solo una, tomar la primera palabra
         return parts[0];
     }
 

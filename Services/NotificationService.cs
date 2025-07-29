@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using NotifyOutSystems.Models;
-using System.Diagnostics;
+using Windows.UI.Notifications;
+using Windows.Data.Xml.Dom;
 
 namespace NotifyOutSystems.Services;
 
@@ -15,6 +16,7 @@ public class NotificationService : INotificationService
 {
     private readonly ILogger<NotificationService> _logger;
     private readonly AppConfiguration _config;
+    private readonly string _appId = "NotifyOutSystems";
 
     public NotificationService(ILogger<NotificationService> logger, AppConfiguration config)
     {
@@ -52,14 +54,14 @@ public class NotificationService : INotificationService
         }
     }
 
-    public async Task SendNotificationAsync(string title, string message)
+    public Task SendNotificationAsync(string title, string message)
     {
         try
         {
             if (!_config.EnableNotifications)
             {
                 _logger.LogInformation("Notificaciones deshabilitadas en configuración");
-                return;
+                return Task.CompletedTask;
             }
 
             if (!IsNotificationSupported())
@@ -67,28 +69,30 @@ public class NotificationService : INotificationService
                 _logger.LogWarning("Notificaciones no soportadas en este sistema");
                 // Fallback: mostrar en consola
                 Console.WriteLine($"[NOTIFICACIÓN] {title}: {message}");
-                return;
+                return Task.CompletedTask;
             }
 
-            // Usar PowerShell para enviar notificación de Windows 10/11
-            await SendWindowsNotificationAsync(title, message);
+            // Enviar notificación toast nativa de Windows
+            SendToastNotification(title, message);
 
-            _logger.LogInformation("Notificación enviada: {Title} - {Message}", title, message);
+            _logger.LogInformation("Notificación toast enviada: {Title} - {Message}", title, message);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error al enviar notificación");
+            _logger.LogError(ex, "Error al enviar notificación toast");
             
             // Fallback: mostrar en consola si las notificaciones fallan
-            Console.WriteLine($"[NOTIFICACIÓN] {title}: {message}");
+            Console.WriteLine($"[NOTIFICACIÓN FALLBACK] {title}: {message}");
         }
+        
+        return Task.CompletedTask;
     }
 
     public bool IsNotificationSupported()
     {
         try
         {
-            // Verificar si estamos en Windows 10/11
+            // Verificar si estamos en Windows 10/11 con soporte para notificaciones
             if (Environment.OSVersion.Platform != PlatformID.Win32NT)
             {
                 return false;
@@ -99,8 +103,9 @@ public class NotificationService : INotificationService
                 return false;
             }
 
-            // Verificar si PowerShell está disponible
-            return File.Exists(@"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe");
+            // Verificar que las APIs de Windows Runtime estén disponibles
+            var notificationManager = ToastNotificationManager.History;
+            return notificationManager != null;
         }
         catch
         {
@@ -108,52 +113,52 @@ public class NotificationService : INotificationService
         }
     }
 
-    private async Task SendWindowsNotificationAsync(string title, string message)
+    private void SendToastNotification(string title, string message)
     {
         try
         {
-            // Escapar caracteres especiales para PowerShell
-            var escapedTitle = title.Replace("'", "''").Replace("`", "``");
-            var escapedMessage = message.Replace("'", "''").Replace("`", "``");
+            // Crear el template XML para la notificación toast
+            var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText02);
             
-            // Script de PowerShell para mostrar notificación usando BurntToast
-            var script = $@"
-                # Intentar usar BurntToast si está disponible, sino usar método simple
-                try {{
-                    Import-Module BurntToast -ErrorAction Stop
-                    New-BurntToastNotification -Text '{escapedTitle}', '{escapedMessage}' -AppLogo 'https://via.placeholder.com/48x48.png?text=OS'
-                }} catch {{
-                    # Fallback: usar msg.exe para mostrar un mensaje simple
-                    msg.exe * /time:10 '{escapedTitle}: {escapedMessage}'
-                }}
-            ";
-
-            var processInfo = new ProcessStartInfo
+            // Obtener los elementos de texto
+            var textElements = toastXml.GetElementsByTagName("text");
+            
+            // Configurar el título
+            if (textElements.Count > 0)
             {
-                FileName = "powershell.exe",
-                Arguments = $"-Command \"{script}\"",
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true
-            };
-
-            using var process = Process.Start(processInfo);
-            if (process != null)
-            {
-                await process.WaitForExitAsync();
-                
-                if (process.ExitCode != 0)
-                {
-                    var error = await process.StandardError.ReadToEndAsync();
-                    _logger.LogWarning("PowerShell notification failed: {Error}", error);
-                    throw new Exception($"PowerShell notification failed: {error}");
-                }
+                textElements[0].AppendChild(toastXml.CreateTextNode(title));
             }
+            
+            // Configurar el mensaje
+            if (textElements.Count > 1)
+            {
+                textElements[1].AppendChild(toastXml.CreateTextNode(message));
+            }
+
+            // Configurar audio
+            var audioElement = toastXml.CreateElement("audio");
+            audioElement.SetAttribute("src", "ms-winsoundevent:Notification.Default");
+            audioElement.SetAttribute("loop", "false");
+            
+            var toastElement = toastXml.SelectSingleNode("/toast");
+            if (toastElement != null)
+            {
+                toastElement.AppendChild(audioElement);
+            }
+
+            // Crear y configurar la notificación toast
+            var toast = new ToastNotification(toastXml);
+            toast.ExpirationTime = DateTimeOffset.Now.AddMinutes(5);
+            toast.Tag = "OutSystems";
+            toast.Group = "Deployments";
+
+            // Mostrar la notificación
+            var notifier = ToastNotificationManager.CreateToastNotifier(_appId);
+            notifier.Show(toast);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to send Windows notification via PowerShell");
+            _logger.LogError(ex, "Error al crear notificación toast nativa");
             throw;
         }
     }
