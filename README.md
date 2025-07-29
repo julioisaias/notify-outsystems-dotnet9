@@ -11,7 +11,7 @@ Monitor de deployments para OutSystems LifeTime que detecta cambios de estado y 
 - ✅ Monitoreo cada 10 segundos (configurable)
 - ✅ Detección de cambios de estado
 - ✅ Cálculo de duración de deployments
-- ✅ Procesamiento inteligente de detalles (SAM vs otros)
+- ✅ Procesamiento inteligente de detalles
 - ✅ Filtrado por ambientes (Homologación y Producción)
 
 ## Requisitos
@@ -48,8 +48,8 @@ Editar el archivo `appsettings.json` con tus credenciales:
 ```json
 {
   "OutSystemsSettings": {
-    "LoginUrl": "https://oslt.itaipu/lifetime",
-    "StagingListUrl": "https://oslt.itaipu/lifetime/Stagings_List.aspx",
+    "LoginUrl": "https://your-outsystems-url/lifetime",
+    "StagingListUrl": "https://your-outsystems-url/lifetime/Stagings_List.aspx",
     "MonitoringIntervalSeconds": 10,
     "Username": "tu_usuario",
     "Password": "tu_contraseña",
@@ -112,8 +112,7 @@ sc start "OutSystems Monitor"
 1. **Scraping**: Cada 10 segundos, la aplicación hace scraping de la página de staging
 2. **Detección de cambios**: Compara el estado actual con el estado anterior almacenado en SQLite
 3. **Procesamiento de detalles**:
-   - Si el detalle comienza con "SAM", toma las dos primeras palabras (ej: "SAM GM", "SAM Material")
-   - Para otros casos, toma solo la primera palabra (ej: "PMIB")
+   - Procesa los detalles del deployment para identificar el sistema o aplicación
 4. **Filtrado de ambientes**: Solo notifica para "Homologation" y "Production"
 5. **Notificaciones**: Envía notificaciones nativas de Windows cuando hay cambios
 
@@ -125,8 +124,8 @@ sc start "OutSystems Monitor"
 
 ### Mensajes de Notificación
 
-- `"SAM GM está haciendo un pase a Homologación"`
-- `"PMIB hizo un pase a Producción (Duración: 00:15:30)"`
+- `"Sistema está haciendo un pase a Homologación"`
+- `"Aplicación hizo un pase a Producción (Duración: 00:15:30)"`
 
 ## Base de Datos
 

@@ -158,15 +158,15 @@ public static class TestNotifications
 
     private static async Task TestStandardApplication(NotificationService notificationService)
     {
-        Console.WriteLine("🧪 Test 5: Aplicación estándar SAM...");
+        Console.WriteLine("🧪 Test 5: Aplicación estándar...");
         
         var deployment = new DeploymentPlan
         {
             PlanName = "Test Plan 5",
             DeployedTo = "Homologation",
             Status = "Running",
-            Details = "SAM Modules",
-            ProcessedDetails = "SAM Modules",
+            Details = "StandardApp",
+            ProcessedDetails = "StandardApp",
             LastUpdated = DateTime.Now
         };
 

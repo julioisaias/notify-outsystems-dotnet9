@@ -41,7 +41,7 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 - **Monitoreo**: Detección de cambios cada 10 segundos (configurable)
 - **Notificaciones**: Sistema de notificaciones nativas de Windows
 - **Lógica de Negocio**: 
-  - Procesamiento inteligente de detalles (SAM toma 2 palabras, otros 1 palabra)
+  - Procesamiento inteligente de detalles de aplicaciones
   - Filtrado por ambientes Homologación y Producción
   - Cálculo de duración de deployments
 - **Configuración**: URLs y credenciales configurables

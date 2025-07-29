@@ -259,27 +259,14 @@ public class ScrapingService : IScrapingService, IDisposable
         if (parts.Length == 0)
             return details;
 
-        // Aplicaciones estándar que se manejan de forma especial
-        var standardApps = new[] { "SAM", "SICAFI", "SIAPI", "SIAPI2", "SIRHUS", "SIGECO" };
-        
-        // Si el primer palabra es una aplicación estándar, tomar las dos primeras palabras
-        if (standardApps.Contains(parts[0], StringComparer.OrdinalIgnoreCase))
+        // Si es una sola aplicación, retornar el nombre completo
+        if (parts.Length == 1)
         {
-            if (parts.Length >= 2)
-            {
-                return $"{parts[0]} {parts[1]}";
-            }
             return parts[0];
         }
 
-        // Si hay múltiples aplicaciones que no son estándar, indicar "Varias aplicaciones"
-        if (parts.Length > 1)
-        {
-            return "Varias aplicaciones";
-        }
-
-        // Si no es estándar y es solo una, tomar la primera palabra
-        return parts[0];
+        // Si hay múltiples aplicaciones, indicar "Varias aplicaciones"
+        return "Varias aplicaciones";
     }
 
     private string CleanStatus(string status)

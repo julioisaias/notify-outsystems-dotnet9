@@ -4,7 +4,7 @@ Write-Host "=== Test de Notificaciones OutSystems ===" -ForegroundColor Green
 Write-Host "Probando diferentes escenarios de notificación..." -ForegroundColor Yellow
 
 # Ejecutar pruebas de notificación específicas
-Write-Host "`n1. Probando notificación simple (SAM aplicación)..." -ForegroundColor Cyan
+Write-Host "`n1. Probando notificación simple (aplicación)..." -ForegroundColor Cyan
 dotnet run --project NotifyOutSystems.csproj TestNotifications single
 
 Write-Host "`n2. Probando notificación múltiples aplicaciones..." -ForegroundColor Cyan  
