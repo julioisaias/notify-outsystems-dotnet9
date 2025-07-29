@@ -43,7 +43,15 @@ Monitor de deployments para OutSystems LifeTime que detecta cambios de estado y 
 
 ### 1. Configurar appsettings.json
 
-Editar el archivo `appsettings.json` con tus credenciales:
+**IMPORTANTE**: El archivo `appsettings.json` está incluido en `.gitignore` para evitar subir credenciales al repositorio.
+
+Copiar el archivo de ejemplo y editar con tus credenciales:
+
+```bash
+cp appsettings.Example.json appsettings.json
+```
+
+Luego editar `appsettings.json` con tus credenciales:
 
 ```json
 {
@@ -51,8 +59,8 @@ Editar el archivo `appsettings.json` con tus credenciales:
     "LoginUrl": "https://your-outsystems-url/lifetime",
     "StagingListUrl": "https://your-outsystems-url/lifetime/Stagings_List.aspx",
     "MonitoringIntervalSeconds": 10,
-    "Username": "tu_usuario",
-    "Password": "tu_contraseña",
+    "Username": "YOUR_USERNAME_HERE",
+    "Password": "YOUR_PASSWORD_HERE",
     "EnableNotifications": true,
     "SessionTimeoutMinutes": 30
   }
